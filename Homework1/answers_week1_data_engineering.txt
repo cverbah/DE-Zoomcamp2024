@@ -1,0 +1,70 @@
+HOMEWORK 1
+Question 1:
+r: --rm
+
+Question 2:
+r: 0.42.0
+
+Question 3:
+r: 15612
+
+SELECT
+  CAST(lpep_pickup_datetime AS DATE) pick_up_date, CAST(lpep_dropoff_datetime AS DATE) drop_off_date,
+  count(1) as "count"
+FROM public.green_taxi_trips
+WHERE CAST(lpep_pickup_datetime AS DATE) = '2019-09-18' AND CAST(lpep_dropoff_datetime AS DATE) = '2019-09-18'
+GROUP BY
+  1,2
+ORDER BY "pick_up_date" DESC;
+
+Question 4:
+r: 2019-09-26
+
+SELECT
+  CAST(lpep_pickup_datetime AS DATE) pick_up_date, MAX(trip_distance) max_distance
+FROM public.green_taxi_trips
+GROUP BY
+  1
+ORDER BY "max_distance" DESC;
+
+Question 5:
+r: Brooklyn, Manhattan, Queens
+
+SELECT zp."Borough" AS "PUBorough", SUM(gtp.total_amount) AS "total"
+FROM public.green_taxi_trips gtp
+INNER JOIN public.zones zp ON gtp."PULocationID" = zp."LocationID"
+WHERE CAST(lpep_pickup_datetime AS DATE) = '2019-09-18' AND zp."Borough" != 'Unknown'
+GROUP BY zp."Borough"
+HAVING SUM(gtp.total_amount) > 50000
+ORDER BY "total" DESC
+LIMIT 100
+
+
+
+Question 6:
+r:JFK Airport 
+
+
+SELECT zd."Zone" AS "DOZone", MAX(gtp.tip_amount) AS total_tip
+FROM public.green_taxi_trips gtp
+INNER JOIN public.zones zp ON gtp."PULocationID" = zp."LocationID"
+INNER JOIN public.zones zd ON gtp."DOLocationID" = zd."LocationID"
+WHERE zp."Zone" = 'Astoria' 
+GROUP BY zd."Zone"
+ORDER BY total_tip DESC;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
