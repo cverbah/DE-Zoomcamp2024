@@ -1,0 +1,70 @@
+Homework 3:
+
+Question 1:
+840402
+
+Question 2:
+0 MB for the External Table and 6.41MB for the Materialized Table
+
+Question 3:
+1622
+
+Question 4:
+Partition by lpep_pickup_datetime Cluster on PUlocationID
+
+Question 5:
+12.82 MB for non-partitioned table and 1.12 MB for the partitioned table
+
+Question 6:
+GCP Bucket
+
+Question 7:
+False
+
+
+QUERIES:
+
+-- Create external table referring to gcs path
+CREATE OR REPLACE EXTERNAL TABLE `de-zoomcamp-2024-412222.green_taxi_data_2022_hwk3.green_taxi_external_data`
+OPTIONS (
+  format = 'PARQUET',
+  uris = ['gs://green-taxi-de-data-2024/green_taxi_trips_records_2022.parquet/834101ec2e2143fcb289fe71ea263188-0.parquet']
+
+);
+
+-- check created table
+SELECT * FROM de-zoomcamp-2024-412222.green_taxi_data_2022_hwk3.green_taxi_external_data
+LIMIT 10;
+
+
+-- question 2 external table
+SELECT DISTINCT(pulocation_id) FROM de-zoomcamp-2024-412222.green_taxi_data_2022_hwk3.green_taxi_external_data;
+
+-- question 2 table
+SELECT DISTINCT(pulocation_id) FROM de-zoomcamp-2024-412222.green_taxi_data_2022_hwk3.green_taxi_data;
+
+-- create table in bq (not external)
+CREATE OR REPLACE TABLE  de-zoomcamp-2024-412222.green_taxi_data_2022_hwk3.green_taxi_data
+AS
+SELECT * FROM de-zoomcamp-2024-412222.green_taxi_data_2022_hwk3.green_taxi_external_data;
+
+
+-- question 3
+SELECT COUNT(fare_amount) FROM de-zoomcamp-2024-412222.green_taxi_data_2022_hwk3.green_taxi_external_data
+WHERE fare_amount = 0;
+
+
+-- question 5
+SELECT COUNT(pulocation_id) FROM de-zoomcamp-2024-412222.green_taxi_data_2022_hwk3.green_taxi_data
+WHERE DATE(lpep_pickup_datetime) >= '2022-06-01' AND DATE(lpep_pickup_datetime) <= '2022-06-30';
+
+-- question 5 partition
+CREATE OR REPLACE TABLE de-zoomcamp-2024-412222.green_taxi_data_2022_hwk3.green_taxi_data_partitioned_clustered
+PARTITION BY DATE(lpep_pickup_datetime)
+CLUSTER BY (pulocation_id) AS
+SELECT * FROM de-zoomcamp-2024-412222.green_taxi_data_2022_hwk3.green_taxi_data;
+
+-- question 5 query partitioned table
+SELECT COUNT(pulocation_id) FROM de-zoomcamp-2024-412222.green_taxi_data_2022_hwk3.green_taxi_data_partitioned_clustered
+WHERE DATE(lpep_pickup_datetime) >= '2022-06-01' AND DATE(lpep_pickup_datetime) <= '2022-06-30';
+
